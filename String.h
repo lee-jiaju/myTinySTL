@@ -13,7 +13,9 @@ namespace TinySTL{
     class String
     {
     public:
-        typedef char 
+        typedef char value_type;
+        typedef char* iterator;
+        typedef const
         String(/* args */);
         ~String();
     };
