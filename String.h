@@ -136,10 +136,13 @@ namespace TinySTL{
             auto ptr = TinySTL::uninitialized_copy(begin() + pos, begin() + pos + len, s);
             return size_t(ptr - s);
         }
-        
 
-
-        
+        size_t find(string& str, size_t pos = 0) const;
+        size_t find(const char *s, size_t pos = 0) const;
+        size_t find(const char *s, size_t pos = 0, size_t n) const;
+        size_t find(char c, size_t pos = 0) const;
+        size_t rfind(char c, size_t pos = 0) const;
+        size_t rfind_aux(const_iterator cit, size_t pos, size_t lengthOfS, int cond) const; 
     };
 
     template<InputIterator>
@@ -150,7 +153,7 @@ namespace TinySTL{
     }
 
 
-
+ 
     template <class InputIterator>
 	string(InputIterator first, InputIterator last){
         return string_mux(first,last,typename std::is_integral<InputIterator>::type());

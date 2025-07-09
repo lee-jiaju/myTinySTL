@@ -254,22 +254,129 @@ namespace TinySTL{
         return *this;
     }
 
+    size_t string::find_aux(const_iterator cit, size_t pos, size_t lengthOfS, size_t cond) const
+    {
+        size_t i, j;
+        for (i = pos; i != cond; ++i)
+        {
+            for (j = 0; j != lengthOfS; ++j)
+            {
+                if (*(begin() + i + j) != cit[j])
+                    break;
+            }
+            if (j == lengthOfS)
+                return i;
+        }
+        return npos;
+    }
 
 
+    size_t string::find(string& str, size_t pos = 0) const
+    {
+        if (s == nullptr || *s == '\0')
+            return pos < size() ? pos : npos;
 
-    string::iterator string::insert_aux_filln(iterator p,size_t t,value_type c){
-        size_type newCapacity = getNewCapacity(t);
-        iterator newStart = dataAllocator::allocate(newCapacity);
-        iterator newFinish = TinySTL::uninitialized_copy(newStart,start_,p);
-        newFinish = TinySTL::uninitialized_fill_n(newFinish,t,c);
-        auto res = newFinish;
-        newFinish = TinySTL::uninitialized_copy(newFInish,p,finish_);
+        size_t lengthOfS = str.size();
+        if (lengthOfS == 0)
+            return pos < size() ? pos : npos;
 
-        destroyAndDeallocate();
-        start_ = newStart;
-        finish_ = newFinish;
-        endOfStorage_ = start_ + newCapacity;
-        return res;
+        if (lengthOfS > size() - pos)
+            return npos;
+
+        return find_aux(str.cbegin(), pos, lengthOfS, size());
+    }
+
+
+    size_t string::find(const char *s, size_t pos = 0) const{
+        return find(s, pos, strlen(s));
+    }
+
+    size_t string::find(const char *s, size_t pos = 0,size_t n) const
+    {
+        //lengthOfS is meaningless here
+        size_t lengthOfS = strlen(s);
+        if (s == nullptr || *s == '\0')
+            return pos < size() ? pos : npos;
+
+        if (n > size() - pos){
+            return npos;
+        }
+        return find_aux(s, pos, n, size());
+    }
+
+    size_t string::find(const char c, size_t pos = 0) const {
+        for (auto cit = cbegin() + pos; cit != cend(); cit++)
+        {
+            if (*cit == c)
+            {
+                return cit - cbegin();
+            }
+        }
+        return npos;
+    }
+
+    size_t string::rfind(const char c, size_t pos = 0) const
+    {
+        for (auto cit = cbegin() + pos; cit != cbegin(); cit--)
+        {
+            if (*cit == c)
+            {
+                return cit - cbegin();
+            }
+        }
+        return npos;
+    }
+
+    size_t string::rfind_aux(const_iterator cit, size_t pos, size_t lengthOfS, int cond) const
+    {
+        // 处理空子串的特殊情况（根据需求，可能返回npos或pos）
+        if (lengthOfS == 0)
+        {
+            return npos;
+        }
+        const size_t str_len = size(); // 原字符串长度
+        // 有效起始位置的最大值：原字符串长度 - 子串长度（不能为负）
+        const size_t max_valid_pos = str_len >= lengthOfS ? str_len - lengthOfS : 0;
+        // 实际查找的起始位置：取pos和max_valid_pos中的较小值（不能超过原字符串范围）
+        const size_t start_pos = pos > max_valid_pos ? max_valid_pos : pos;
+        // 从start_pos向前递减查找，直到达到cond或0（根据cond的语义调整）
+        // 假设cond是允许的最小起始位置（如0），则循环条件为i >= cond
+        for (size_t i = start_pos; i >= static_cast<size_t>(cond); --i)
+        {
+            bool match = true;
+            // 检查子串的每个字符是否匹配
+            for (size_t j = 0; j < lengthOfS; ++j)
+            {
+                // 关键：确保i+j不越界（理论上已通过start_pos保证，双重检查更安全）
+                if (i + j >= str_len || *(begin() + i + j) != cit[j])
+                {
+                    match = false;
+                    break;
+                }
+            }
+            if (match)
+            {
+                return i; // 找到匹配，返回起始位置
+            }
+        }
+        return npos; // 未找到
+    }
+
+    
+
+    string::iterator string::insert_aux_filln(iterator p, size_t t, value_type c){
+    size_type newCapacity = getNewCapacity(t);
+    iterator newStart = dataAllocator::allocate(newCapacity);
+    iterator newFinish = TinySTL::uninitialized_copy(newStart, start_, p);
+    newFinish = TinySTL::uninitialized_fill_n(newFinish, t, c);
+    auto res = newFinish;
+    newFinish = TinySTL::uninitialized_copy(newFInish, p, finish_);
+
+    destroyAndDeallocate();
+    start_ = newStart;
+    finish_ = newFinish;
+    endOfStorage_ = start_ + newCapacity;
+    return res;
         
     }
     
