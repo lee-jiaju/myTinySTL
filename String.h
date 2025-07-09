@@ -75,8 +75,46 @@ namespace TinySTL{
         void empty()const {return finish_ == start_};
         void resize(size_t n);
         void resize(size_t n,char c);
+        void reserve(size_t n);
+        void shrink_to_fit(){
+            dataAllocator::deallocate(finish_,endOfStorage_ - finish_);
+            endOfStorage_ = finish_;
+        }
+
+        char& operator[] (size_t pos) {return *(start_ + pos)};
+        const char& operator[] (size_t pos)const {return *(start_ + pos)};
+        char& back(){return *(finish_ - 1)};
+        const char& back()const {return *(finish_ - 1)};
+        char& front(){return *(start_)};
+        const char& front()const {return *(start_)}; 
+
+        void push_back(char c) {insert(end(),c)};
+        string& insert(size_t pos,const string& str);
+        string& insert(size_t pos,const string& str,size_t subpos, size_t sublen);
+        string& insert(size_t pos,char* str);
+        string& insert(size_t pos,size_t n,char c);
+        string& insert(iterator p,size_t n,char c);
+        string& insert(iterator p,char c);
+        template <class InputIterator>
+        iterator insert(iterator p, InputIterator first, InputIterator last);
+        string& append(string& str);
+        string& append(string& str,size_t subpos,size_t sublen);
+        string& append(const char* s);
+        string& append(const char* s,size_t len);
+        string& append(size_t n,char c);
+        template <class InputIterator>
+	    string& append(InputIterator first, InputIterator last);
+        string& operator+= (string& str);
+        string& operator+= (char* s);
+        string& operator+= (char c);
+
+        void pop_back(){ erase(end()-1,end())};
+        iterator erase(iterator first,iterator last);
+        iterator erase(iterator p);
+        string& erase(size_t pos = 0,size_t len = npos);
 
         
+
 
 
         
@@ -88,17 +126,45 @@ namespace TinySTL{
         return string_mux(first,last,typename std::is_integral<InputIterator>::type());
     }
 
-    template<class InputIterator>
+    template <class InputIterator>
+    string::iterator string::insert_aux_copy(iterator p, InputIterator first, InputIterator last){
+        size_t lengthOfInsert = last - first;
+        auto newCapacity = getNewCapacity(lengthOfInsert);
+        iterator newStart = dataAllocator(newCapacity);
+        iterator newFinish = TinySTL::uninitialized_copy(start_,p,newStart);
+        iterator newFinish = TinySTL::uninitialized_copy(first,last,newfinish);
+        auto res = newFinish;
+        iterator newFinish = TinySTL::uninitialized_copy(p,finish_,newFinish);
+
+        destroyAndDeallocate();
+        start_ = newStart;
+        finish_ = newFinish;
+
+        return res;
+    }
+
+    template <class InputIterator>
     string::iterator string::insert(iterator p, InputIterator first, InputIterator last){
         auto lengthOfLeft = capacity() - size();
 		size_t lengthOfInsert = distance(first, last);
         if(lengthOfInsert <= lengthOfLeft){
             for (iterator it = finish_ - 1; it >= p; it--)
             {
-                *(it + lengthOfInsert)
+                *(it + lengthOfInsert) = *(it)
             }
-            
+            TinySTL::uninitialized_copy(first,last,p);
+            finish_ += lengOfInsert;
+            return p+ lengthOfInsert;
         }
+        else{
+            return insert_aux_copy(p,first,last);
+        }
+    }
+
+    template <class InputIterator>
+	string& string::append(InputIterator first, InputIterator last){
+        insert(end(),first,last);
+        return *this;
     }
 
     template<class InputIterator>

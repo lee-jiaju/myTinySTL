@@ -108,6 +108,143 @@ namespace TinySTL{
 		endOfStorage_ = start_ + n;
 	}
 
+    string& string::insert(size_t pos,const string& str){
+        insert(start_ + pos, str.begin(), str.end());
+        return *this;
+    }
+
+    string& string::insert(size_t pos,const string& str,size_t subpos, size_t sublen){
+        changeVarWhenEuqalNPOS(sublen,str.size(),target_pos);
+        insert(start_ + pos , str.begin() + subpos,str.begin() + subpos + sublen);
+        return *this;
+    }
+
+    string& string::insert(size_t pos,char* str){
+        insert(start_ + pos ,str ,str+strlen(str));
+        return *this;
+    }
+
+    string& string::insert(size_t pos,char* s ,size_t n){
+        insert(start_ + pos ,s , s+n);
+        return *this;
+    }
+
+    string& string::insert(size_t pos,size_t n,char c){
+        insert(start_ + pos,n,c);
+        return *this;
+    }
+
+    string& string::insert(iterator p,size_t n,char c){
+        insert(p,n,c);
+        return *this;
+    }
+
+    string& string::insert(iterator p,char c){
+        insert(p,1,c);
+        return *this;
+    }
+
+    string& string::append(string& str){
+        *this += str;
+        return *this;
+    }
+
+    string& string::append(string& str,size_t subpos,size_t sublen){
+        sublen = changeVarWhenEuqalNPOS(sublen,str.size(),subpos);
+        insert(size(),str,subpos,sublen);
+        return *this;
+    }
+
+    string& string::append(const char* s){
+        insert(size(),s);
+        return *this;
+    }
+
+    string& string::append(const char* s,size_t len){
+        insert(size(),s,len);
+        return *this;
+    }
+
+    string& string::append(size_t n,char c){
+        insert(end(),n,c);
+        return *this;
+    }
+
+    string& string::operator+= (string& str){
+        insert(size(),str);
+        return *this;
+    }
+
+    string& string::operator+= (char* s){
+        insert(size(),s);
+        return *this;
+    }
+
+    string& string::operator+= (char c){
+        insert(end,c);
+        return *this;
+    }
+
+    string::iterator string::erase(iterator first,iterator last){
+        size_t lengthOfMove = finish_ - last;
+        for (size_t i = 0; i < lengthOfMove; i++)
+        {
+            *(first+i) = *(last+i);
+        }
+        dataAllocator::destory(first + lengthOfMove,finish_);
+        finish_ = first + lengthOfMove;
+        return first;
+    }
+
+    string::iterator string::erase(iterator p){
+        return erase(p,p+1);
+    }
+    
+    string& string::erase(size_t pos = 0,size_t len = npos){
+        len = changeVarWhenEuqalNPOS(len,size(),pos);
+        erase(start_ + pos,start_ + pos + len);
+        return *this;
+    }
+
+
+
+
+    string::iterator string::insert_aux_filln(iterator p,size_t t,value_type c){
+        size_type newCapacity = getNewCapacity(t);
+        iterator newStart = dataAllocator::allocate(newCapacity);
+        iterator newFinish = TinySTL::uninitialized_copy(newStart,start_,p);
+        newFinish = TinySTL::uninitialized_fill_n(newFinish,t,c);
+        auto res = newFinish;
+        newFinish = TinySTL::uninitialized_copy(newFInish,p,finish_);
+
+        destroyAndDeallocate();
+        start_ = newStart;
+        finish_ = newFinish;
+        endOfStorage_ = start_ + newCapacity;
+        return res;
+        
+    }
+    
+    string::iterator string::insert(iterator p,size_t n,value_type c){
+        size_type endOfLeft = endOfStorage_ - finish_;
+        if (n <= endOfLeft)
+        {
+            for (iterator it = finish_ - 1; it >= p; it--)
+            {
+                *(it + n) = *it;
+            }
+            auto res = TinySTL::uninitialized_fill_n(p,n,c);
+            finish_ += n;
+            return res;
+        }
+        else{
+            auto res = insert_aux_filln(p,n,c);
+            return res;
+        }
+        
+    }
+
+
     string::size_type string::getNewCapacity(size_type len)const{
         //initial capacity or double or n
         size_type oldCapacity = endOfStorage_ - start_;
