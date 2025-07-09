@@ -113,12 +113,42 @@ namespace TinySTL{
         iterator erase(iterator p);
         string& erase(size_t pos = 0,size_t len = npos);
 
-        
 
+        string& replace(pos,len,const string& str);
+        string& replace(iterator i1,iterator i2,const string& str);
+        template<InputIterator>
+        string& replace(iterator i1,iterator i2,InputIterator first,InputIterator last);
+        string& replace(size_t pos,size_t len,const string& str,size_t subpos,size_t sublen);
+        string& replace(size_t pos,size_t len,const char* s);
+        string& replace(iterator i1, iterator i2,const char* s);
+        string& replace(size_t pos,size_t len,const char* s,size_t n);
+        string& replace(iterator i1,iterator i2,const char* s,size_t n);
+        string& replace(size_t pos,size_t len,size_t n,char c);
+        string& replace(iterator i1,iterator i2,size_t n,char c);
+
+        void swap(str){
+            TinySTL::swap(start_,str.start_);
+            TinySTL::swap(finish_,str.finish_);
+            TinySTL::swap(endOfStorage_,str.endOfStorage_);
+        }
+
+        void copy(const char* s,size_t len,size_t pos = 0){
+            auto ptr = TinySTL::uninitialized_copy(begin() + pos, begin() + pos + len, s);
+            return size_t(ptr - s);
+        }
+        
 
 
         
     };
+
+    template<InputIterator>
+    string& replace(iterator i1,iterator i2,InputIterator first,InputIterator last){
+        iterator ptr = erase(i1,i2);
+        insert(ptr,first,last);
+        return *this;
+    }
+
 
 
     template <class InputIterator>

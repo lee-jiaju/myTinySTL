@@ -206,6 +206,54 @@ namespace TinySTL{
         return *this;
     }
 
+    string& string::replace(pos,len,const string& str){
+        relpace(begin()+pos,begin()+pos+len,str.begin(),str.end());
+        return *this;
+    }
+    
+    string& string::replace(iterator i1,iterator i2,const string& str){
+        replace(i1,i2,str.begin(),str.end());
+        return *this;
+    }
+
+    string& string::replace(size_t pos,size_t len,const string& str,size_t subpos,size_t sublen){
+        sublen = changeVarWhenEuqalNPOS(sublen,str.size(),subpos);
+        replace(begin() + pos, end() + pos + len, str.begin() + subpos, str.begin() + subpos + sublen);
+        return *this;
+    }
+
+    string& string::replace(size_t pos, size_t len, const char* s){
+        replace(begin() + pos, end() + pos + len, s, s + strlen(s));
+        return *this;
+    }
+
+    string& string::replace(iterator i1, iterator i2,const char* s){
+        replace(i1,i2,s,s+strlen(s));
+        return *this;
+    }
+
+    string& string::replace(size_t pos,size_t len,const char* s,size_t n){
+        replace(begin()+pos,begin()+pos+len,s,s+n);
+        return *this;
+    }
+
+    string& string::replace(iterator i1,iterator i2,const char* s,size_t n){
+        replace(i1,i2,s,s+n);
+        return *this;
+    }
+
+    string& replace(size_t pos,size_t len,size_t n,char c){
+        replace(begin() + pos, begin() + pos + len, n, c);
+        return *this;
+    }
+
+
+    string& string::replace(iterator i1,iterator i2,size_t n,char c){
+        auto ptr = erase(i1,i2);
+        insert(ptr,n,c);
+        return *this;
+    }
+
 
 
 
