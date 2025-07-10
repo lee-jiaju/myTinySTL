@@ -141,22 +141,99 @@ namespace TinySTL{
         size_t find(const char *s, size_t pos = 0) const;
         size_t find(const char *s, size_t pos = 0, size_t n) const;
         size_t find(char c, size_t pos = 0) const;
-        size_t rfind(char c, size_t pos = 0) const;
-        size_t rfind_aux(const_iterator cit, size_t pos, size_t lengthOfS, int cond) const; 
-    };
+        size_t rfind(char c, size_t pos = npos) const;
+        size_t rfind(const string& str, size_t pos = npos) const;
+        size_t rfind(const char *s, size_t pos, size_t n) const;
+        size_t rfind(const char *s, size_t pos = npos) const;
+        size_t find_first_of(const char *s, size_t pos, size_t n) const;
+        size_t find_first_of(const char *s, size_t pos = 0) const;
+        size_t find_first_of(const string& str, size_t pos = 0) const;
+        size_t find_first_of(char c, size_t pos = 0) const;
+        size_t find_first_not_of(const char *s, size_t pos, size_t n) const;
+        size_t find_first_not_of(const char *s, size_t pos = 0) const;
+        size_t find_first_not_of(const string &str, size_t pos = 0) const;
+        size_t find_first_not_of(char c, size_t pos = 0) const;
+        size_t find_last_of(const char *s, size_t pos, size_t n) const;
+        size_t find_last_of(const char *s, size_t pos = 0) const;
+        size_t find_last_of(const string &str, size_t pos = 0) const;
+        size_t find_last_of(char c, size_t pos = 0) const;
+        size_t find_last_not_of(const char *s, size_t pos, size_t n) const;
+        size_t find_last_not_of(const char *s, size_t pos = 0) const;
+        size_t find_last_not_of(const string &str, size_t pos = 0) const;
+        size_t find_last_not_of(char c, size_t pos = 0) const;
 
-    template<InputIterator>
-    string& replace(iterator i1,iterator i2,InputIterator first,InputIterator last){
-        iterator ptr = erase(i1,i2);
-        insert(ptr,first,last);
+        string substr(size_t pos = 0, size_t len = npos) const {
+            len = changeVarWhenEuqalNPOS(len, size(), pos);
+            return string(start_ + pos, start_ + pos + len);
+        };
+
+        int compare(const string &str) const;
+        int compare(size_t pos, size_t len, const string &str) const;
+        int compare(size_t pos, size_t len, const string &str,
+                    size_t subpos, size_t sublen = npos) const;
+        int compare(const char *s) const;
+        int compare(size_t pos, size_t len, const char *s) const;
+        int compare(size_t pos, size_t len, const char *s, size_t n) const;
+    
+    private:
+        void moveData(string &str);
+        // 插入时空间不足的情况
+        template <class InputIterator>
+        iterator insert_aux_copy(iterator p, InputIterator first, InputIterator last);
+        // 插入时空间不足的情况
+        iterator insert_aux_filln(iterator p, size_t n, value_type c);
+        size_type getNewCapacity(size_type len) const;
+        void allocateAndFillN(size_t n, char c);
+        template <class InputIterator>
+        void allocateAndCopy(InputIterator first, InputIterator last);
+        void string_aux(size_t n, char c, std::true_type);
+        template <class InputIterator>
+        void string_aux(InputIterator first, InputIterator last, std::false_type);
+        void destroyAndDeallocate();
+        size_t rfind_aux(const_iterator cit, size_t pos, size_t lengthOfS, int cond) const;
+        size_t find_aux(const_iterator cit, size_t pos, size_t lengthOfS, size_t cond) const;
+        int compare_aux(size_t pos, size_t len, const_iterator cit, size_t subpos, size_t sublen) const;
+        bool isContained(char ch, const_iterator first, const_iterator last) const;
+        size_t changeVarWhenEuqalNPOS(size_t var, size_t minuend, size_t minue) const;
+
+    public:
+        // 运算符重载
+        string& operator+= (const string& str) {
+            return append(str);
+        }
+    
+    
+    
+    };
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    template <InputIterator>
+    string& string::replace(iterator i1, iterator i2, InputIterator first, InputIterator last)
+    {
+        iterator ptr = erase(i1, i2);
+        insert(ptr, first, last);
         return *this;
     }
 
 
  
     template <class InputIterator>
-	string(InputIterator first, InputIterator last){
-        return string_mux(first,last,typename std::is_integral<InputIterator>::type());
+	string::string(InputIterator first, InputIterator last){
+        return string_aux(first,last,typename std::is_integral<InputIterator>::type());
     }
 
     template <class InputIterator>
@@ -211,7 +288,7 @@ namespace TinySTL{
     }
 
     template <class InputIterator>
-    string::string_mux(InputIterator first,InputIterator last,std.false_type){
+    string::string_aux(InputIterator first,InputIterator last,std.false_type){
         allocateAndCopy(first,last);
     }
 

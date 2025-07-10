@@ -315,7 +315,7 @@ namespace TinySTL{
         return npos;
     }
 
-    size_t string::rfind(const char c, size_t pos = 0) const
+    size_t string::rfind(const char c, size_t pos = npos) const
     {
         for (auto cit = cbegin() + pos; cit != cbegin(); cit--)
         {
@@ -362,24 +362,211 @@ namespace TinySTL{
         return npos; // 未找到
     }
 
-    
-
-    string::iterator string::insert_aux_filln(iterator p, size_t t, value_type c){
-    size_type newCapacity = getNewCapacity(t);
-    iterator newStart = dataAllocator::allocate(newCapacity);
-    iterator newFinish = TinySTL::uninitialized_copy(newStart, start_, p);
-    newFinish = TinySTL::uninitialized_fill_n(newFinish, t, c);
-    auto res = newFinish;
-    newFinish = TinySTL::uninitialized_copy(newFInish, p, finish_);
-
-    destroyAndDeallocate();
-    start_ = newStart;
-    finish_ = newFinish;
-    endOfStorage_ = start_ + newCapacity;
-    return res;
-        
+    size_t string::rfind(const string &str, size_t pos = npos) const{
+        lengthOfS = str.size();
+        pos = changeVarWhenEuqalNPOS(pos,size(),1);
+        return rfind_aux(str.cbegin(), pos, lengthOfS, 0);
     }
-    
+
+    size_t string::rfind(const char* s, size_t pos = npos) const{
+        size_t lengthOfS = strlen(s);
+        pos = changeVarWhenEuqalNPOS(pos,size(),1);
+        return rfind(s, pos, lengthOfS);
+    }
+
+    size_t string::rfind(const char* s, size_t pos, size_t n) const{
+        if (s == nullptr || *s == '\0')
+            return pos < size() ? pos : npos;
+
+        if (n > size() - pos)
+            return npos;
+
+        return rfind_aux(s, pos, n, 0);
+    }
+
+    size_t string::find_first_of(const char* s, size_t pos, size_t n) const{
+        if (s == nullptr || *s == '\0')
+            return pos < size() ? pos : npos;
+
+        for (auto cit = cbegin() + pos; cit != cend(); cit++){
+            if (isContained(*cit, s, s + n)){
+                return cit - cbegin();
+            }
+        }
+        return npos;
+    }
+    size_t string::find_first_of(const char *s, size_t pos) const
+    {
+        return find_first_of(s, pos, strlen(s));
+    }
+
+    size_t string::find_first_of(const string &str, size_t pos) const
+    {
+        if (str.empty())
+            return pos < size() ? pos : npos;
+
+        find_first_of(str.cbegin(), pos, str.size());
+    }
+
+    size_t string::find_first_of(char c, size_t pos) const
+    {
+        return find(c,pos);
+    }
+
+    size_t string::find_first_not_of(const char *s, size_t pos, size_t n) const
+    {
+        if (s == nullptr || *s == '\0'){
+            return pos < size() ? pos : npos;
+        }
+        
+        for (size_t i = 0; i < n; i++){
+            if(!isContained(s[i], s, s+n)){
+                return i;
+            }
+        }
+        return npos;
+    }
+
+    size_t string::find_first_not_of(const char *s, size_t pos) const{
+        return find_first_not_of(s, pos, strlen(s));
+    }
+
+    size_t string::find_first_not_of(const string &str, size_t pos) const{
+        return find_first_not_of(str.cbegin(), pos, str.size());
+    }
+
+    size_t string::find_first_not_of(char c, size_t pos) const{
+        for (auto cit = cbegin() + pos; cit != cend(); cit++){
+            if (*cit != c){
+                return cit - cbegin();
+            }
+        }
+        return npos;
+    }
+
+    size_t string::find_last_of(const char *s, size_t pos, size_t n) const{
+        if (s == nullptr || *s == '\0'){
+            return pos < size() ? pos : npos;
+        }
+        for(size_t i = pos; i >= 0; i--){
+            if (isContained(s[i], s, s + n)){
+                return i;
+            }
+        }
+        return npos;
+    }
+
+    size_t string::find_last_of(const char *s, size_t pos) const{
+        return find_last_of(s, pos, strlen(s));
+    }
+
+    size_t string::find_last_of(const string &str, size_t pos) const{
+        if (str.empty())
+            return pos < size() ? pos : npos;
+
+        return find_last_of(str.cbegin(), pos, str.size());
+    }
+
+    size_t string::find_last_of(char c, size_t pos) const{
+        for (auto cit = cbegin() + pos; cit != cbegin(); cit--){
+            if (*cit == c){
+                return cit - cbegin();
+            }
+        }
+        return npos;
+    }
+
+    size_t string::find_last_not_of(const char *s, size_t pos, size_t n) const{
+        if (s == nullptr || *s == '\0'){
+            return pos < size() ? pos : npos;
+        }
+        for (size_t i = pos; i >= 0; i--){
+            if (!isContained(s[i], s, s + n)){
+                return i;
+            }
+        }
+        return npos;
+    }
+
+    size_t string::find_last_not_of(const char *s, size_t pos = 0) const{
+        return find_last_not_of(s, pos, strlen(s));
+    }
+    size_t string::find_last_not_of(const string &str, size_t pos = 0) const{
+        return find_last_not_of(str.cbegin(), pos, str.size());
+    }
+    size_t string::find_last_not_of(char c, size_t pos = 0) const{
+        for (auto cit = cbegin() + pos; cit != cbegin(); cit--){
+            if (*cit != c){
+                return cit - cbegin();
+            }
+        }
+        return npos;
+    }
+
+    int string::compare_aux(size_t pos, size_t len, const_iterator s,size_t subpos,size_t sublen) const{
+        size_t i,j;
+        for (j = 0, i = 0; i < len && j < sublen; i++, j++){
+            if (s[subpos + j] > *this[pos + i]){
+                return 1; // this > s
+            }
+            else if (s[subpos + j] < *this[pos + i]){
+                return -1; // this < s
+            }
+        }
+        if (i == len && j == sublen){
+            return 0; // this == s
+        }
+        else if (i == len){
+            return -1; // this < s
+        }
+        else{
+            return 1; // this > s
+        } 
+    }
+
+    int string::compare(const string &str) const{
+        return compare_aux(0, size(), str.cbegin(), 0, str.size());
+    }
+
+    int string::compare(size_t pos, size_t len, const string &str) const{
+        return compare_aux(pos, len, str.cbegin(), 0, str.size());
+    }
+
+    int string::compare(size_t pos, size_t len, const string &str,size_t subpos, size_t sublen) const{
+        //sublen = changeVarWhenEuqalNPOS(sublen, str.size(), subpos);
+        return compare_aux(pos, len, str.cbegin(), subpos, sublen);
+    }
+
+    int string::compare(const char *s) const{
+        return compare(0, size(), s, strlen(s));
+    }
+
+    int string::compare(size_t pos, size_t len, const char *s) const{
+        return compare(pos, len, s, strlen(s));
+    }
+
+    int string::compare(size_t pos, size_t len, const char *s, size_t n) const{
+        //n = changeVarWhenEuqalNPOS(n, strlen(s), 0);
+        return compare_aux(pos, len, s, 0, n);
+    }
+
+
+    string::iterator string::insert_aux_filln(iterator p, size_t t, value_type c)
+    {
+        size_type newCapacity = getNewCapacity(t);
+        iterator newStart = dataAllocator::allocate(newCapacity);
+        iterator newFinish = TinySTL::uninitialized_copy(newStart, start_, p);
+        newFinish = TinySTL::uninitialized_fill_n(newFinish, t, c);
+        auto res = newFinish;
+        newFinish = TinySTL::uninitialized_copy(newFInish, p, finish_);
+
+        destroyAndDeallocate();
+        start_ = newStart;
+        finish_ = newFinish;
+        endOfStorage_ = start_ + newCapacity;
+        return res;
+    }
+
     string::iterator string::insert(iterator p,size_t n,value_type c){
         size_type endOfLeft = endOfStorage_ - finish_;
         if (n <= endOfLeft)
@@ -431,7 +618,16 @@ namespace TinySTL{
         dataAllocator::deallocate(start_,endOfStorage_ - start_);
     }
 
-    void string::string_mux(size_t n,char c,std::true_type){
+    bool string::isContained(char ch,const_iterator first,const_iterator last) const {
+        for (auto cit = first; cit != last; cit++){
+            if (*cit == ch){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void string::string_aux(size_t n,char c,std::true_type){
         allocateAndFillN(n,c);
     }
 };
