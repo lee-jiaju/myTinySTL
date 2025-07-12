@@ -198,28 +198,76 @@ namespace TinySTL{
 
     public:
         // 运算符重载
-        string& operator+= (const string& str) {
-            return append(str);
-        }
-    
-    
+        friend std::ostream& operator<< (std::ostream& os,const string& str);
+        friend std::ostream& operator>> (std::ostream& is,const string& str);
+        friend string operator+ (string& lstr,string& rstr);
+        friend string operator+ (const string& lhs, const char* rhs);
+		friend string operator+ (const char* lhs, const string& rhs);
+		friend string operator+ (const string& lhs, char rhs);
+		friend string operator+ (char lhs, const string& rhs);
+        friend bool operator== (const string& lhs,const string& rhs);
+        friend bool operator== (const string& lhs,const char* rhs);
+        friend bool operator== (const char* lhs,const string& rhs);
+        friend bool operator!= (const string& lhs, const string& rhs);
+		friend bool operator!= (const char*   lhs, const string& rhs);
+		friend bool operator!= (const string& lhs, const char*   rhs);
+        friend bool operator>= (const string& lhs, const string& rhs);
+		friend bool operator>= (const char*   lhs, const string& rhs);
+		friend bool operator>= (const string& lhs, const char*   rhs);
+        friend bool operator<= (const string& lhs, const string& rhs);
+		friend bool operator<= (const char*   lhs, const string& rhs);
+		friend bool operator<= (const string& lhs, const char*   rhs);
+        friend bool operator> (const string& lhs, const string& rhs);
+        friend bool operator> (const char* lhs, const string& rhs);
+        friend bool operator> (const string& lhs, const char* rhs);
+        friend bool operator< (const string& lhs, const string& rhs);
+        friend bool operator< (const char* lhs, const string& rhs);
+        friend bool operator< (const string& lhs, const char* rhs);
+        friend void swap(string& x, string& y);
+        friend std::istream& getline(std::istream& is, string& str, char delim);
+		friend std::istream& getline(std::istream& is, string& str);
+
+
     
     };
     
     
     
-    
-    
-     
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    template<class Iterator1,class Iterator2>
+    bool isLessEqual(Iterator1 first1,Iterator1 last1,Iterator2 first2,Iterator2 first2){
+        for (; first1 != last1 && first2 != last2; first1++,first2++){
+            if (*first1 < *first2){
+                return true;    
+            }
+            else if (*first1 > *first2){
+                return false;
+            }
+        }
+        if ((first1 == last1 && first2 == last2) || first1 == last1){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    template<class Iterator1,class Iterator2>
+    bool isGreaterEqual(Iterator1 first1,Iterator1 last1,Iterator2 first2,Iterator2 last2){
+        for (; first1 != last1 && first2 != last2; first1++,first2++){
+            if (*first1 > *first2){
+                return true;    
+            }
+            else if (*first1 < *first2){
+                return false;
+            }
+        }
+        if ((first1 == last1 && first2 == last2) || first2 == last2){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
     
     template <InputIterator>
     string& string::replace(iterator i1, iterator i2, InputIterator first, InputIterator last)

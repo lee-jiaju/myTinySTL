@@ -586,6 +586,165 @@ namespace TinySTL{
         
     }
 
+    std::ostream& operator<< (std::ostream& os,const string& str){
+        for (const auto ch : str){
+            os << ch;
+        }
+        return os;
+    }
+
+    std::ostream& operator>> (std::ostream& is,const string& str){
+        char ch;
+        size_type oldSize = str.size();
+        bool hasBlankPre = true;
+
+        while(is.get(ch)){
+            if (isblank(ch) || ch = "\n"){
+                hasBlankPre = false;
+            }
+            else
+                break;
+        }
+        is.putback(ch);
+        str.clear();
+        while (is.get(ch))
+        {
+            if (ch != EOF && !isblank(ch) && ch != "\n"){
+                str.push_back(ch);
+            }
+            else
+                break;
+        }
+        return is
+    }
+
+    string operator+ (string& lstr,string& rstr){
+        string res(lstr);
+        return lstr += rstr;
+    }
+    string operator+ (const string& lhs, const char* rhs){
+        string res(lhs);
+        return res+=rhs;
+    }
+	string operator+ (const char* lhs, const string& rhs){
+        string res(lhs);
+        return res+=rhs;
+    }
+    string operator+ (const string& lhs, char rhs){
+        string res(lhs);
+        return res+=rhs;
+    }
+	string operator+ (char lhs, const string& rhs){
+        string res(lhs);
+        return res+=rhs;
+    }
+    bool operator== (const string& lhs,const string& rhs){
+        if (lhs.size() == rhs.size()){
+            for (auto lit = lhs.begin(),rit = rhs.begin();lit != lhs.cend() && rit != rhs.cend(); lit++,rit++){
+                if (*lit != *rit){
+                    return false;
+                }
+            }
+            return true;            
+        }
+        return false;
+    }
+    bool operator== (const char* lhs,const string& rhs){
+        if (strlen(lhs) == rhs.size()){
+            for (auto lit = lhs ,rit = rhs.begin();lit != lhs + strlen(s) && rit != rhs.cend(); lit++,rit++){
+                if (*lit != *rit){
+                    return false;
+                }
+            }
+            return true;            
+        }
+        return false;
+    }
+    bool operator== (const string& lhs,const char* rhs){
+        return rhs == lhs;
+    }
+    bool operator!= (const string& lhs, const string& rhs){
+        return !(lhs==rhs);
+    }
+	bool operator!= (const char*   lhs, const string& rhs){
+        return !(lhs==rhs);
+    }
+	bool operator!= (const string& lhs, const char*   rhs){
+        return !(lhs==rhs);
+    }
+
+    bool operator> (const string& lhs, const string& rhs){
+        return !(lhs <= rhs);
+    }
+
+    bool operator> (const char* lhs, const string& rhs){
+        return !(lhs <= rhs);
+    }
+
+    bool operator> (const string& lhs, const char* rhs){
+        return !(lhs <= rhs);
+    }
+
+    bool operator<= (const string& lhs, const string& rhs){
+        return isLessEqual(lhs.begin(),lhs.end(),rhs.begin(),rhs.end());
+    }
+
+	bool operator<= (const char* lhs, const string& rhs){
+        return isLessEqual(lhs,lhs+strlen(lhs),rhs.begin(),rhs.end());
+    }
+
+	bool operator<= (const string& rhs, const char* rhs){
+        return isLessEqual(rhs.begin(),rhs.end(),rhs,rhs+strlen(rhs));
+    }
+
+        bool operator> (const string& lhs, const char* rhs){
+        return !lhs <= rhs;
+    }
+
+    bool operator>= (const string& lhs, const string& rhs){
+        return isGreaterEqual(lhs.begin(),lhs.end(),rhs.begin(),rhs.end());
+    }
+
+	bool operator>= (const char* lhs, const string& rhs){
+        return isGreaterEqual(lhs,lhs+strlen(lhs),rhs.begin(),rhs.end());
+    }
+
+	bool operator>= (const string& rhs, const char* rhs){
+        return isGreaterEqual(rhs.begin(),rhs.end(),rhs,rhs+strlen(rhs));
+    }
+
+    bool operator< (const string& lhs, const string& rhs){
+        return !(lhs >= rhs);
+    }
+
+    bool operator< (const char* lhs, const string& rhs){
+        return !(lhs >= rhs);
+    }
+
+    bool operator< (const string& lhs, const char* rhs){
+        return !(lhs >= rhs);
+    }
+
+    friend void swap(string& x, string& y){
+        x.swap(y);
+    }
+
+    friend std::istream& getline(std::istream& is, string& str, char delim){
+        str.clear();
+        char ch;
+        while(is.get(ch)){
+            if (ch != delim){
+                str.push_back(ch);
+            }
+            else
+                break;
+        }
+        return is;
+    }
+	friend std::istream& getline(std::istream& is, string& str){
+        return getline(is,str,'\n');
+    }
+
 
     string::size_type string::getNewCapacity(size_type len)const{
         //initial capacity or double or n
