@@ -183,8 +183,7 @@ namespace TinySTL
     //********** [any_of] *************************
     //********* [Algorithm Complexity: O(N)] ****************
     template <class InputIterator, class UnaryPredicate>
-    bool any_of(InputIterator first, InputIterator last, UnaryPredicate pred)
-    {
+    bool any_of(InputIterator first, InputIterator last, UnaryPredicate pred){
         for (; first != last; ++first)
         {
             if (pred(*first))
@@ -195,8 +194,7 @@ namespace TinySTL
     //********** [none_of] *************************
     //********* [Algorithm Complexity: O(N)] ****************
     template <class InputIterator, class UnaryPredicate>
-    bool none_of(InputIterator first, InputIterator last, UnaryPredicate pred)
-    {
+    bool none_of(InputIterator first, InputIterator last, UnaryPredicate pred){
         for (; first != last; ++first)
         {
             if (pred(*first))
@@ -205,6 +203,6 @@ namespace TinySTL
         return true;
     }
 
-    
+
 }
 #endif
