@@ -203,6 +203,115 @@ namespace TinySTL
         return true;
     }
 
+    template <class InputIterator,class Function>
+    Function for_each(InputIterator first, InputIterator last, Function fn)
+    {
+        for (; first != last; ++first){
+            fn(*first);
+        }
+        return fn;
+    }
 
+    template <class InputIterator, class T>
+    InputIterator find_of(InputIterator first, InputIterator last, const T& value){
+        for (; first != last; ++first){
+            if (*first == value)
+                return true;
+        }
+        return false;
+    }
+
+    template <class InputIterator, class UnaryPredicate>
+    InputIterator find_if(InputIterator first, InputIterator last, UnaryPredicate pred)
+    {
+        for (; first != last; ++first){
+            if (pred(*first))
+                return true;
+        }
+        return false;
+    }
+
+    template <class InputIterator, class UnaryPredicate>
+    InputIterator find_if_not(InputIterator first, InputIterator last, UnaryPredicate pred)
+    {
+        for (; first != last; ++first)
+        {
+            if (pred(*first))
+                return false;
+        }
+        return true;
+    }
+
+    template <class ForwardIterator1, class ForwardIterator2>
+    ForwardIterator1 find_end(ForwardIterator1 first, ForwardIterator1 last, ForwardIterator2 s_first, ForwardIterator2 s_last)
+    {
+        if (s_first == s_last)
+            return last;
+        ForwardIterator1 result = last;
+        for (; first != last; ++first)
+        {
+            if (*first == *s_first)
+            {
+                auto it1 = first;
+                auto it2 = s_first;
+                while (it1 != last && it2 != s_last && *it1 == *it2)
+                {
+                    ++it1;
+                    ++it2;
+                }
+                if (it2 == s_last)
+                    result = first;
+            }
+        }
+        return result;
+    }
+
+    template <class ForwardIterator1, class ForwardIterator2, class BinaryPredicate>
+    ForwardIterator1 find_end(ForwardIterator1 first, ForwardIterator1 last, ForwardIterator2 s_first, ForwardIterator2 s_last,BinaryPredicate pred)
+    {
+        if (s_first == s_last)
+            return last;
+        ForwardIterator1 result = last;
+        for (; first != last; ++first)
+        {
+            if (pred(*first, *s_first))
+            {
+                auto it1 = first;
+                auto it2 = s_first;
+                while (it1 != last && it2 != s_last && pred(*it1, *it2))
+                {
+                    ++it1;
+                    ++it2;
+                }
+                if (it2 == s_last)
+                    result = first;
+            }
+        }
+        return result;
+    }
+
+    template <class ForwardIterator1, class ForwardIterator2>
+    ForwardIterator1 find_first_of(ForwardIterator1 first, ForwardIterator1 last, ForwardIterator2 s_first, ForwardIterator2 s_last){
+        for (; first != last; first++){
+            for (auto it = s_first; it != s_last; ++it){
+                if (*first == *it)
+                    return first;
+            }
+        }
+        return last; 
+    }
+
+    template <class ForwardIterator1, class ForwardIterator2, class BinaryPredicate>
+    ForwardIterator1 find_first_of(ForwardIterator1 first, ForwardIterator1 last, ForwardIterator2 s_first, ForwardIterator2 s_last, BinaryPredicate pred){
+        for (; first != last; first++){
+            for (auto it = s_first; it != s_last; ++it){
+                if (pred(*first, *it))
+                    return first;
+            }
+        }
+        return last;
+    }
+
+    
 }
 #endif
